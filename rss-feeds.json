@@ -1,0 +1,22 @@
+[
+  {
+    "label": "Kementerian Perindustrian - Industri Semen",
+    "kategori": "perindustrian",
+    "url": "https://www.google.com/alerts/feeds/05349771648966409958/12423812356699182875"
+  },
+  {
+    "label": "KLHK - Lingkungan Industri Semen",
+    "kategori": "lingkungan",
+    "url": "https://www.google.com/alerts/feeds/05349771648966409958/8041794513696247394"
+  },
+  {
+    "label": "ESDM - Energi & Pertambangan Semen",
+    "kategori": "esdm",
+    "url": "https://www.google.com/alerts/feeds/05349771648966409958/13368693224871635365"
+  },
+  {
+    "label": "Kemnaker - K3 Industri Semen",
+    "kategori": "k3",
+    "url": "https://www.google.com/alerts/feeds/05349771648966409958/11680786956381202"
+  }
+] 
