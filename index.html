@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monitor Peraturan &mdash; Industri Semen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<style>
+  :root{
+    --ink:#1C2B39;
+    --ink-2:#33465A;
+    --concrete:#EEEAE2;
+    --concrete-2:#E1DBCF;
+    --paper:#FBFAF7;
+    --line:#D8D2C4;
+    --muted:#7C7568;
+    --amber:#C77D3B;
+    --amber-dark:#A5622A;
+    --c-perindustrian:#3B6EA5;
+    --c-lingkungan:#4B7A51;
+    --c-esdm:#B5562B;
+    --c-k3:#A63D40;
+    --c-lainnya:#7C7568;
+    --radius:10px;
+    --shadow:0 1px 2px rgba(28,43,57,.06), 0 4px 16px rgba(28,43,57,.05);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--concrete);
+    font-family:'Inter',sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+  }
+  ::selection{background:var(--amber);color:#fff;}
+
+  /* ---- Header ---- */
+  header.top{
+    background:var(--ink);
+    color:var(--paper);
+    padding:28px 20px 60px;
+    position:relative;
+    overflow:hidden;
+  }
+  header.top::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image: repeating-linear-gradient(90deg, rgba(255,255,255,.035) 0 1px, transparent 1px 40px);
+    pointer-events:none;
+  }
+  .top-inner{max-width:960px;margin:0 auto;position:relative;}
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+    color:#C9B79A; margin-bottom:10px; display:flex; align-items:center; gap:8px;
+  }
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--amber);display:inline-block;}
+  h1{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:clamp(26px,4vw,38px);
+    margin:0 0 8px;
+    letter-spacing:-.01em;
+  }
+  .subtitle{color:#B9C2CB;font-size:14.5px;max-width:560px;line-height:1.5;}
+
+  .statbar{
+    max-width:960px;margin:-40px auto 0; position:relative; z-index:2;
+    display:grid; grid-template-columns:repeat(4,1fr); gap:1px;
+    background:var(--line); border:1px solid var(--line);
+    border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow);
+  }
+  .stat{background:var(--paper); padding:16px 18px;}
+  .stat .n{font-family:'Fraunces',serif; font-weight:700; font-size:26px; line-height:1;}
+  .stat .l{font-size:11.5px; color:var(--muted); margin-top:6px; text-transform:uppercase; letter-spacing:.06em;}
+  .stat.new .n{color:var(--amber-dark);}
+
+  main{max-width:960px;margin:0 auto;padding:28px 20px 100px;}
+
+  /* ---- Controls ---- */
+  .controls{
+    display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    margin-bottom:18px;
+  }
+  .search{
+    flex:1 1 240px; position:relative;
+  }
+  .search input{
+    width:100%; padding:11px 14px 11px 38px; border-radius:8px;
+    border:1px solid var(--line); background:var(--paper);
+    font-family:'Inter'; font-size:14px; color:var(--ink);
+  }
+  .search input:focus{outline:2px solid var(--amber); outline-offset:-1px;}
+  .search svg{position:absolute; left:12px; top:50%; transform:translateY(-50%); opacity:.45;}
+
+  .chips{display:flex; gap:6px; flex-wrap:wrap;}
+  .chip{
+    font-size:12.5px; font-weight:600; padding:8px 13px; border-radius:20px;
+    border:1px solid var(--line); background:var(--paper); color:var(--ink-2);
+    cursor:pointer; white-space:nowrap; transition:.15s;
+  }
+  .chip:hover{border-color:var(--amber);}
+  .chip.active{background:var(--ink); color:#fff; border-color:var(--ink);}
+
+  /* ---- List ---- */
+  .list{display:flex; flex-direction:column; gap:10px;}
+  .card{
+    background:var(--paper); border:1px solid var(--line); border-radius:var(--radius);
+    padding:16px 18px; box-shadow:var(--shadow); position:relative;
+  }
+  .card-top{display:flex; justify-content:space-between; gap:10px; align-items:flex-start;}
+  .badges{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;}
+  .badge{
+    font-family:'JetBrains Mono',monospace; font-size:10.5px; font-weight:500;
+    padding:3px 8px; border-radius:5px; text-transform:uppercase; letter-spacing:.04em;
+    color:#fff;
+  }
+  .badge.perindustrian{background:var(--c-perindustrian);}
+  .badge.lingkungan{background:var(--c-lingkungan);}
+  .badge.esdm{background:var(--c-esdm);}
+  .badge.k3{background:var(--c-k3);}
+  .badge.lainnya{background:var(--c-lainnya);}
+  .badge.baru{background:var(--amber); color:#fff;}
+  .badge.manual{background:transparent; border:1px solid var(--line); color:var(--muted);}
+
+  .judul{font-family:'Fraunces',serif; font-weight:600; font-size:16.5px; line-height:1.35; margin:0 0 6px;}
+  .meta{font-size:12.5px; color:var(--muted); display:flex; gap:14px; flex-wrap:wrap;}
+  .meta span{display:flex; align-items:center; gap:5px;}
+
+  .card-actions{display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;}
+  .btn-link{
+    font-size:12.5px; font-weight:600; padding:7px 12px; border-radius:6px;
+    text-decoration:none; display:inline-flex; align-items:center; gap:5px;
+    border:1px solid var(--line); color:var(--ink-2); background:var(--concrete);
+  }
+  .btn-link:hover{border-color:var(--amber); color:var(--amber-dark);}
+  .btn-danger{color:var(--c-k3); border-color:var(--c-k3);}
+  .btn-danger:hover{background:var(--c-k3); color:#fff;}
+
+  .empty{
+    text-align:center; padding:60px 20px; color:var(--muted);
+  }
+  .empty .big{font-family:'Fraunces',serif; font-size:20px; color:var(--ink); margin-bottom:6px;}
+
+  /* ---- FAB / Admin ---- */
+  .fab{
+    position:fixed; right:22px; bottom:22px; z-index:40;
+    background:var(--ink); color:#fff; border:none; border-radius:50px;
+    padding:13px 20px; font-family:'Inter'; font-weight:600; font-size:13.5px;
+    display:flex; align-items:center; gap:8px; cursor:pointer; box-shadow:0 6px 20px rgba(28,43,57,.3);
+  }
+  .fab:hover{background:var(--ink-2);}
+
+  .modal-bg{
+    position:fixed; inset:0; background:rgba(28,43,57,.55); backdrop-filter:blur(2px);
+    display:none; align-items:center; justify-content:center; z-index:100; padding:16px;
+  }
+  .modal-bg.show{display:flex;}
+  .modal{
+    background:var(--paper); border-radius:14px; max-width:480px; width:100%;
+    max-height:88vh; overflow-y:auto; padding:26px; box-shadow:0 20px 60px rgba(0,0,0,.3);
+  }
+  .modal h2{font-family:'Fraunces',serif; font-size:21px; margin:0 0 4px;}
+  .modal .desc{font-size:13px; color:var(--muted); margin-bottom:18px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block; font-size:12.5px; font-weight:600; margin-bottom:6px; color:var(--ink-2);}
+  .field input, .field select, .field textarea{
+    width:100%; padding:10px 12px; border-radius:7px; border:1px solid var(--line);
+    font-family:'Inter'; font-size:14px; background:#fff;
+  }
+  .field textarea{resize:vertical; min-height:60px;}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .modal-actions{display:flex; gap:10px; margin-top:18px;}
+  .btn{
+    flex:1; padding:11px; border-radius:8px; border:none; font-weight:600; font-size:14px; cursor:pointer;
+  }
+  .btn-primary{background:var(--ink); color:#fff;}
+  .btn-primary:hover{background:var(--ink-2);}
+  .btn-ghost{background:var(--concrete); color:var(--ink-2);}
+  .btn-ghost:hover{background:var(--concrete-2);}
+  .close-x{position:absolute; top:16px; right:16px; background:none; border:none; cursor:pointer; opacity:.5; font-size:20px;}
+  .close-x:hover{opacity:1;}
+  .modal{position:relative;}
+
+  .admin-bar{
+    background:#fff7ec; border:1px solid #E9CFA6; border-radius:10px;
+    padding:10px 14px; font-size:12.5px; color:var(--amber-dark); margin-bottom:16px;
+    display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;
+  }
+  .admin-bar b{font-weight:700;}
+  .admin-bar-actions{display:flex; gap:8px;}
+  .mini-btn{
+    font-size:12px; font-weight:600; padding:6px 10px; border-radius:6px; border:1px solid #E9CFA6;
+    background:#fff; color:var(--amber-dark); cursor:pointer;
+  }
+
+  .toast{
+    position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(100px);
+    background:var(--ink); color:#fff; padding:12px 20px; border-radius:8px; font-size:13.5px;
+    z-index:200; transition:transform .25s ease; box-shadow:0 6px 20px rgba(0,0,0,.3);
+  }
+  .toast.show{transform:translateX(-50%) translateY(0);}
+
+  footer{text-align:center; padding:20px; font-size:11.5px; color:var(--muted);}
+
+  @media(max-width:640px){
+    .statbar{grid-template-columns:repeat(2,1fr);}
+    .row2{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="eyebrow"><span class="dot"></span> PT INDOCEMENT TUNGGAL PRAKARSA TBK &mdash; PLANT TARJUN</div>
+    <h1>Monitor Peraturan Perundang-undangan</h1>
+    <p class="subtitle">Pemantauan otomatis regulasi pemerintah yang berkaitan langsung dengan industri semen — perindustrian, lingkungan, energi/pertambangan, dan keselamatan kerja.</p>
+  </div>
+</header>
+
+<div class="statbar" id="statbar">
+  <div class="stat"><div class="n" id="statTotal">0</div><div class="l">Total Peraturan</div></div>
+  <div class="stat new"><div class="n" id="statBaru">0</div><div class="l">Baru (belum dibaca)</div></div>
+  <div class="stat"><div class="n" id="statMinggu">0</div><div class="l">7 Hari Terakhir</div></div>
+  <div class="stat"><div class="n" id="statSumber">4</div><div class="l">Sumber Dipantau</div></div>
+</div>
+
+<main>
+
+  <div id="adminBar" class="admin-bar" style="display:none;">
+    <span>🔓 Mode Admin aktif</span>
+    <div class="admin-bar-actions">
+      <button class="mini-btn" onclick="openAddModal()">+ Tambah Manual</button>
+      <button class="mini-btn" onclick="markAllRead()">Tandai Semua Dibaca</button>
+      <button class="mini-btn" onclick="exportPDF()">Export PDF</button>
+      <button class="mini-btn" onclick="logoutAdmin()">Keluar</button>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" id="searchInput" placeholder="Cari judul peraturan..." oninput="render()">
+    </div>
+  </div>
+
+  <div class="chips" id="chips">
+    <button class="chip active" data-cat="semua" onclick="setCategory('semua')">Semua</button>
+    <button class="chip" data-cat="perindustrian" onclick="setCategory('perindustrian')">Perindustrian</button>
+    <button class="chip" data-cat="lingkungan" onclick="setCategory('lingkungan')">Lingkungan</button>
+    <button class="chip" data-cat="esdm" onclick="setCategory('esdm')">ESDM</button>
+    <button class="chip" data-cat="k3" onclick="setCategory('k3')">K3</button>
+    <button class="chip" data-cat="lainnya" onclick="setCategory('lainnya')">Lainnya</button>
+  </div>
+
+  <div style="height:14px;"></div>
+
+  <div class="list" id="list"></div>
+
+  <div class="empty" id="emptyState" style="display:none;">
+    <div class="big">Belum ada peraturan yang cocok</div>
+    <div>Coba ubah kata kunci pencarian atau kategori filter.</div>
+  </div>
+
+</main>
+
+<footer>Data disinkronkan otomatis via Google Alerts + GitHub Actions &middot; Firebase Realtime Database</footer>
+
+<button class="fab" id="fabBtn" onclick="handleFabClick()">🔒 Admin</button>
+
+<!-- Modal: Login Admin -->
+<div class="modal-bg" id="loginModalBg">
+  <div class="modal">
+    <button class="close-x" onclick="closeModal('loginModalBg')">✕</button>
+    <h2>Masuk sebagai Admin</h2>
+    <p class="desc">Masukkan PIN admin untuk menambah, mengedit, atau menghapus peraturan secara manual.</p>
+    <div class="field">
+      <label>PIN Admin</label>
+      <input type="password" id="pinInput" placeholder="••••••" maxlength="10">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('loginModalBg')">Batal</button>
+      <button class="btn btn-primary" onclick="checkPin()">Masuk</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Tambah Peraturan Manual -->
+<div class="modal-bg" id="addModalBg">
+  <div class="modal">
+    <button class="close-x" onclick="closeModal('addModalBg')">✕</button>
+    <h2>Tambah Peraturan Manual</h2>
+    <p class="desc">Gunakan ini jika ada peraturan yang belum tertangkap oleh pemantauan otomatis.</p>
+    <div class="field">
+      <label>Judul Peraturan</label>
+      <textarea id="fJudul" placeholder="Contoh: Peraturan Menteri Perindustrian No. 12 Tahun 2026 tentang ..."></textarea>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>Kategori</label>
+        <select id="fKategori">
+          <option value="perindustrian">Perindustrian</option>
+          <option value="lingkungan">Lingkungan</option>
+          <option value="esdm">ESDM</option>
+          <option value="k3">K3</option>
+          <option value="lainnya">Lainnya</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Tanggal Terbit</label>
+        <input type="date" id="fTanggal">
+      </div>
+    </div>
+    <div class="field">
+      <label>Sumber</label>
+      <input type="text" id="fSumber" placeholder="Contoh: JDIH Kementerian Perindustrian">
+    </div>
+    <div class="field">
+      <label>Link Dokumen</label>
+      <input type="text" id="fLink" placeholder="https://...">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('addModalBg')">Batal</button>
+      <button class="btn btn-primary" onclick="saveManualEntry()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================== KONFIGURASI ================== */
+/* Ganti dengan URL Firebase Realtime Database Bapak (tanpa tanda / di akhir) */
+const FIREBASE_URL = "https://sosialisasi-5992c-default-rtdb.asia-southeast1.firebasedatabase.app";
+/* Ganti PIN default sebelum deploy ke produksi */
+const ADMIN_PIN = "159753";
+/* ==================================================== */
+
+let allData = {};        // { key: {judul, kategori, ...} }
+let activeCategory = "semua";
+let isAdmin = false;
+
+const catLabel = {
+  perindustrian: "Perindustrian",
+  lingkungan: "Lingkungan",
+  esdm: "ESDM",
+  k3: "K3",
+  lainnya: "Lainnya"
+};
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2600);
+}
+
+function openModal(id){ document.getElementById(id).classList.add('show'); }
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+
+/* ---------- Firebase REST helpers ---------- */
+async function fbGet(path){
+  const res = await fetch(`${FIREBASE_URL}/${path}.json`);
+  if(!res.ok) throw new Error('Gagal memuat data dari Firebase');
+  return res.json();
+}
+async function fbPut(path, data){
+  const res = await fetch(`${FIREBASE_URL}/${path}.json`, {
+    method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data)
+  });
+  return res.ok;
+}
+async function fbPatch(path, data){
+  const res = await fetch(`${FIREBASE_URL}/${path}.json`, {
+    method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data)
+  });
+  return res.ok;
+}
+async function fbDelete(path){
+  const res = await fetch(`${FIREBASE_URL}/${path}.json`, { method:'DELETE' });
+  return res.ok;
+}
+
+/* ---------- Load & render ---------- */
+async function loadData(){
+  try{
+    const data = await fbGet('peraturan');
+    allData = data || {};
+    render();
+    updateStats();
+  }catch(e){
+    console.error(e);
+    showToast('⚠️ Gagal memuat data. Cek koneksi Firebase.');
+  }
+}
+
+function updateStats(){
+  const items = Object.values(allData);
+  const total = items.length;
+  const baru = items.filter(i => i.status === 'baru').length;
+  const now = new Date();
+  const minggu = items.filter(i => {
+    const d = new Date(i.tanggalMasuk || i.tanggalTerbit || 0);
+    return (now - d) / 86400000 <= 7;
+  }).length;
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statBaru').textContent = baru;
+  document.getElementById('statMinggu').textContent = minggu;
+}
+
+function setCategory(cat){
+  activeCategory = cat;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('active', c.dataset.cat===cat));
+  render();
+}
+
+function getFiltered(){
+  const q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+  return Object.entries(allData)
+    .filter(([key, it]) => {
+      if(activeCategory !== 'semua' && it.kategori !== activeCategory) return false;
+      if(q && !(it.judul||'').toLowerCase().includes(q)) return false;
+      return true;
+    })
+    .sort((a,b) => new Date(b[1].tanggalTerbit||b[1].tanggalMasuk||0) - new Date(a[1].tanggalTerbit||a[1].tanggalMasuk||0));
+}
+
+function fmtDate(iso){
+  if(!iso) return '-';
+  const d = new Date(iso);
+  if(isNaN(d)) return iso;
+  return d.toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
+}
+
+function render(){
+  const filtered = getFiltered();
+  const list = document.getElementById('list');
+  const empty = document.getElementById('emptyState');
+
+  if(filtered.length === 0){
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  list.innerHTML = filtered.map(([key, it]) => `
+    <div class="card">
+      <div class="badges">
+        <span class="badge ${it.kategori||'lainnya'}">${catLabel[it.kategori] || 'Lainnya'}</span>
+        ${it.status === 'baru' ? '<span class="badge baru">Baru</span>' : ''}
+        ${it.ditambahkanOleh === 'admin' ? '<span class="badge manual">Manual</span>' : ''}
+      </div>
+      <p class="judul">${escapeHtml(it.judul||'(Tanpa judul)')}</p>
+      <div class="meta">
+        <span>📅 ${fmtDate(it.tanggalTerbit)}</span>
+        <span>🏛️ ${escapeHtml(it.sumber||'-')}</span>
+      </div>
+      <div class="card-actions">
+        ${it.link ? `<a class="btn-link" href="${escapeAttr(it.link)}" target="_blank" rel="noopener">🔗 Lihat Sumber</a>` : ''}
+        ${it.status === 'baru' ? `<button class="btn-link" onclick="markRead('${key}')">✓ Tandai Dibaca</button>` : ''}
+        ${isAdmin ? `<button class="btn-link btn-danger" onclick="deleteEntry('${key}')">🗑 Hapus</button>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function escapeAttr(str){ return escapeHtml(str); }
+
+/* ---------- Actions ---------- */
+async function markRead(key){
+  const ok = await fbPatch(`peraturan/${key}`, {status:'dibaca'});
+  if(ok){ allData[key].status='dibaca'; render(); updateStats(); }
+}
+
+async function markAllRead(){
+  const updates = {};
+  Object.keys(allData).forEach(k => { if(allData[k].status==='baru') updates[`peraturan/${k}/status`] = 'dibaca'; });
+  if(Object.keys(updates).length === 0){ showToast('Tidak ada yang perlu ditandai.'); return; }
+  const res = await fetch(`${FIREBASE_URL}/.json`, {
+    method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify(updates)
+  });
+  if(res.ok){
+    Object.keys(allData).forEach(k => { if(allData[k].status==='baru') allData[k].status='dibaca'; });
+    render(); updateStats();
+    showToast('Semua peraturan ditandai sudah dibaca.');
+  }
+}
+
+async function deleteEntry(key){
+  if(!confirm('Hapus peraturan ini secara permanen?')) return;
+  const ok = await fbDelete(`peraturan/${key}`);
+  if(ok){ delete allData[key]; render(); updateStats(); showToast('Peraturan dihapus.'); }
+}
+
+/* ---------- Admin: login/logout ---------- */
+function handleFabClick(){
+  if(isAdmin){ openAddModal(); } else { openModal('loginModalBg'); }
+}
+function checkPin(){
+  const val = document.getElementById('pinInput').value;
+  if(val === ADMIN_PIN){
+    isAdmin = true;
+    document.getElementById('adminBar').style.display = 'flex';
+    document.getElementById('fabBtn').textContent = '＋ Tambah';
+    closeModal('loginModalBg');
+    document.getElementById('pinInput').value = '';
+    render();
+    showToast('Berhasil masuk sebagai admin.');
+  } else {
+    showToast('PIN salah.');
+  }
+}
+function logoutAdmin(){
+  isAdmin = false;
+  document.getElementById('adminBar').style.display = 'none';
+  document.getElementById('fabBtn').textContent = '🔒 Admin';
+  render();
+}
+
+/* ---------- Admin: tambah manual ---------- */
+function openAddModal(){
+  document.getElementById('fJudul').value = '';
+  document.getElementById('fKategori').value = 'perindustrian';
+  document.getElementById('fTanggal').value = new Date().toISOString().slice(0,10);
+  document.getElementById('fSumber').value = '';
+  document.getElementById('fLink').value = '';
+  openModal('addModalBg');
+}
+
+async function saveManualEntry(){
+  const judul = document.getElementById('fJudul').value.trim();
+  if(!judul){ showToast('Judul wajib diisi.'); return; }
+  const record = {
+    judul,
+    kategori: document.getElementById('fKategori').value,
+    tanggalTerbit: document.getElementById('fTanggal').value ? new Date(document.getElementById('fTanggal').value).toISOString() : new Date().toISOString(),
+    sumber: document.getElementById('fSumber').value.trim() || 'Input manual',
+    link: document.getElementById('fLink').value.trim(),
+    tanggalMasuk: new Date().toISOString(),
+    status: 'baru',
+    ditambahkanOleh: 'admin'
+  };
+  const key = 'manual_' + Date.now();
+  const ok = await fbPut(`peraturan/${key}`, record);
+  if(ok){
+    allData[key] = record;
+    closeModal('addModalBg');
+    render(); updateStats();
+    showToast('Peraturan berhasil ditambahkan.');
+  } else {
+    showToast('Gagal menyimpan ke Firebase.');
+  }
+}
+
+/* ---------- Export PDF ---------- */
+function exportPDF(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const filtered = getFiltered();
+
+  doc.setFontSize(14);
+  doc.text('Daftar Peraturan Perundang-undangan - Industri Semen', 14, 16);
+  doc.setFontSize(9);
+  doc.text(`Dicetak: ${new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'})} | Kategori: ${activeCategory === 'semua' ? 'Semua' : catLabel[activeCategory]}`, 14, 22);
+
+  const rows = filtered.map(([key, it]) => [
+    catLabel[it.kategori] || 'Lainnya',
+    it.judul || '-',
+    fmtDate(it.tanggalTerbit),
+    it.sumber || '-',
+    it.status === 'baru' ? 'Baru' : 'Dibaca'
+  ]);
+
+  doc.autoTable({
+    startY: 28,
+    head: [['Kategori', 'Judul Peraturan', 'Tanggal', 'Sumber', 'Status']],
+    body: rows,
+    styles: { fontSize: 8, cellPadding: 3 },
+    headStyles: { fillColor: [28,43,57] },
+    columnStyles: { 1: { cellWidth: 75 } }
+  });
+
+  doc.save(`peraturan-semen-${new Date().toISOString().slice(0,10)}.pdf`);
+  showToast('PDF berhasil dibuat.');
+}
+
+/* ---------- Init ---------- */
+loadData();
+setInterval(loadData, 5 * 60 * 1000); // refresh otomatis tiap 5 menit
+</script>
+</body>
+</html>
