@@ -3,329 +3,451 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Monitor Peraturan &mdash; Industri Semen</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<title>Program Penggerak Pembina Generus - Daerah Kotabaru</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   :root{
-    --ink:#1C2B39;
-    --ink-2:#33465A;
-    --concrete:#EEEAE2;
-    --concrete-2:#E1DBCF;
-    --paper:#FBFAF7;
-    --line:#D8D2C4;
-    --muted:#7C7568;
-    --amber:#C77D3B;
-    --amber-dark:#A5622A;
-    --c-perindustrian:#3B6EA5;
-    --c-lingkungan:#4B7A51;
-    --c-esdm:#B5562B;
-    --c-k3:#A63D40;
-    --c-lainnya:#7C7568;
-    --radius:10px;
-    --shadow:0 1px 2px rgba(28,43,57,.06), 0 4px 16px rgba(28,43,57,.05);
+    --primary:#0f766e;
+    --primary-dark:#0b5c56;
+    --primary-light:#ccfbf1;
+    --accent:#f59e0b;
+    --danger:#dc2626;
+    --bg:#f4f7f6;
+    --card:#ffffff;
+    --text:#1f2937;
+    --muted:#6b7280;
+    --border:#e2e8f0;
+    --radius:14px;
   }
   *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
   body{
-    background:var(--concrete);
-    font-family:'Inter',sans-serif;
-    color:var(--ink);
-    min-height:100vh;
+    margin:0;
+    font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    padding-bottom:40px;
   }
-  ::selection{background:var(--amber);color:#fff;}
-
-  /* ---- Header ---- */
-  header.top{
-    background:var(--ink);
-    color:var(--paper);
-    padding:28px 20px 60px;
-    position:relative;
-    overflow:hidden;
-  }
-  header.top::before{
-    content:"";
-    position:absolute; inset:0;
-    background-image: repeating-linear-gradient(90deg, rgba(255,255,255,.035) 0 1px, transparent 1px 40px);
-    pointer-events:none;
-  }
-  .top-inner{max-width:960px;margin:0 auto;position:relative;}
-  .eyebrow{
-    font-family:'JetBrains Mono',monospace;
-    font-size:11px; letter-spacing:.14em; text-transform:uppercase;
-    color:#C9B79A; margin-bottom:10px; display:flex; align-items:center; gap:8px;
-  }
-  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--amber);display:inline-block;}
-  h1{
-    font-family:'Fraunces',serif;
-    font-weight:600;
-    font-size:clamp(26px,4vw,38px);
-    margin:0 0 8px;
-    letter-spacing:-.01em;
-  }
-  .subtitle{color:#B9C2CB;font-size:14.5px;max-width:560px;line-height:1.5;}
-
-  .statbar{
-    max-width:960px;margin:-40px auto 0; position:relative; z-index:2;
-    display:grid; grid-template-columns:repeat(4,1fr); gap:1px;
-    background:var(--line); border:1px solid var(--line);
-    border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow);
-  }
-  .stat{background:var(--paper); padding:16px 18px;}
-  .stat .n{font-family:'Fraunces',serif; font-weight:700; font-size:26px; line-height:1;}
-  .stat .l{font-size:11.5px; color:var(--muted); margin-top:6px; text-transform:uppercase; letter-spacing:.06em;}
-  .stat.new .n{color:var(--amber-dark);}
-
-  main{max-width:960px;margin:0 auto;padding:28px 20px 100px;}
-
-  /* ---- Controls ---- */
-  .controls{
-    display:flex; gap:10px; flex-wrap:wrap; align-items:center;
-    margin-bottom:18px;
-  }
-  .search{
-    flex:1 1 240px; position:relative;
-  }
-  .search input{
-    width:100%; padding:11px 14px 11px 38px; border-radius:8px;
-    border:1px solid var(--line); background:var(--paper);
-    font-family:'Inter'; font-size:14px; color:var(--ink);
-  }
-  .search input:focus{outline:2px solid var(--amber); outline-offset:-1px;}
-  .search svg{position:absolute; left:12px; top:50%; transform:translateY(-50%); opacity:.45;}
-
-  .chips{display:flex; gap:6px; flex-wrap:wrap;}
-  .chip{
-    font-size:12.5px; font-weight:600; padding:8px 13px; border-radius:20px;
-    border:1px solid var(--line); background:var(--paper); color:var(--ink-2);
-    cursor:pointer; white-space:nowrap; transition:.15s;
-  }
-  .chip:hover{border-color:var(--amber);}
-  .chip.active{background:var(--ink); color:#fff; border-color:var(--ink);}
-
-  /* ---- List ---- */
-  .list{display:flex; flex-direction:column; gap:10px;}
-  .card{
-    background:var(--paper); border:1px solid var(--line); border-radius:var(--radius);
-    padding:16px 18px; box-shadow:var(--shadow); position:relative;
-  }
-  .card-top{display:flex; justify-content:space-between; gap:10px; align-items:flex-start;}
-  .badges{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;}
-  .badge{
-    font-family:'JetBrains Mono',monospace; font-size:10.5px; font-weight:500;
-    padding:3px 8px; border-radius:5px; text-transform:uppercase; letter-spacing:.04em;
+  header.app-header{
+    background:linear-gradient(135deg,var(--primary),var(--primary-dark));
     color:#fff;
+    padding:18px 16px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    flex-wrap:wrap;
+    box-shadow:0 4px 14px rgba(0,0,0,.15);
+    position:sticky;
+    top:0;
+    z-index:100;
   }
-  .badge.perindustrian{background:var(--c-perindustrian);}
-  .badge.lingkungan{background:var(--c-lingkungan);}
-  .badge.esdm{background:var(--c-esdm);}
-  .badge.k3{background:var(--c-k3);}
-  .badge.lainnya{background:var(--c-lainnya);}
-  .badge.baru{background:var(--amber); color:#fff;}
-  .badge.manual{background:transparent; border:1px solid var(--line); color:var(--muted);}
-
-  .judul{font-family:'Fraunces',serif; font-weight:600; font-size:16.5px; line-height:1.35; margin:0 0 6px;}
-  .meta{font-size:12.5px; color:var(--muted); display:flex; gap:14px; flex-wrap:wrap;}
-  .meta span{display:flex; align-items:center; gap:5px;}
-
-  .card-actions{display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;}
-  .btn-link{
-    font-size:12.5px; font-weight:600; padding:7px 12px; border-radius:6px;
-    text-decoration:none; display:inline-flex; align-items:center; gap:5px;
-    border:1px solid var(--line); color:var(--ink-2); background:var(--concrete);
+  .logo-box{
+    width:56px;height:56px;border-radius:12px;background:#fff;
+    display:flex;align-items:center;justify-content:center;overflow:hidden;
+    flex-shrink:0;cursor:pointer;border:2px solid rgba(255,255,255,.6);
   }
-  .btn-link:hover{border-color:var(--amber); color:var(--amber-dark);}
-  .btn-danger{color:var(--c-k3); border-color:var(--c-k3);}
-  .btn-danger:hover{background:var(--c-k3); color:#fff;}
-
-  .empty{
-    text-align:center; padding:60px 20px; color:var(--muted);
+  .logo-box img{width:100%;height:100%;object-fit:cover;}
+  .logo-box span{font-size:10px;color:var(--muted);text-align:center;padding:2px;}
+  .header-titles{flex:1;min-width:200px;}
+  .header-titles h1{margin:0;font-size:17px;line-height:1.3;}
+  .header-titles p{margin:2px 0 0;font-size:12px;opacity:.9;}
+  .tahun-select{
+    background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.4);
+    color:#fff;padding:8px 12px;border-radius:10px;font-size:14px;font-weight:600;
   }
-  .empty .big{font-family:'Fraunces',serif; font-size:20px; color:var(--ink); margin-bottom:6px;}
+  .tahun-select option{color:#000;}
 
-  /* ---- FAB / Admin ---- */
-  .fab{
-    position:fixed; right:22px; bottom:22px; z-index:40;
-    background:var(--ink); color:#fff; border:none; border-radius:50px;
-    padding:13px 20px; font-family:'Inter'; font-weight:600; font-size:13.5px;
-    display:flex; align-items:center; gap:8px; cursor:pointer; box-shadow:0 6px 20px rgba(28,43,57,.3);
+  nav.tabs{
+    display:flex;gap:6px;overflow-x:auto;background:#fff;
+    padding:8px 10px;position:sticky;top:88px;z-index:99;
+    box-shadow:0 2px 6px rgba(0,0,0,.05);
   }
-  .fab:hover{background:var(--ink-2);}
+  nav.tabs button{
+    border:none;background:transparent;padding:10px 14px;border-radius:10px;
+    font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;
+  }
+  nav.tabs button.active{background:var(--primary);color:#fff;}
+
+  main{padding:16px;max-width:1100px;margin:0 auto;}
+  .card{
+    background:var(--card);border-radius:var(--radius);padding:18px;
+    box-shadow:0 2px 10px rgba(0,0,0,.06);margin-bottom:16px;
+  }
+  .card h2{margin-top:0;font-size:16px;color:var(--primary-dark);display:flex;align-items:center;gap:8px;}
+  .grid-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px;}
+  .stat-box{
+    background:linear-gradient(135deg,#fff,var(--primary-light));
+    border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;
+  }
+  .stat-box .value{font-size:22px;font-weight:800;color:var(--primary-dark);}
+  .stat-box .label{font-size:11px;color:var(--muted);margin-top:4px;}
+  .stat-box.highlight{background:linear-gradient(135deg,var(--accent),#fbbf24);}
+  .stat-box.highlight .value,.stat-box.highlight .label{color:#fff;}
+
+  label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin:10px 0 4px;}
+  input,select,textarea{
+    width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;
+    font-size:14px;font-family:inherit;background:#fbfdfd;
+  }
+  textarea{min-height:70px;resize:vertical;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  @media(max-width:560px){.row2{grid-template-columns:1fr;}}
+
+  .btn{
+    display:inline-flex;align-items:center;gap:6px;justify-content:center;
+    padding:11px 18px;border:none;border-radius:10px;font-weight:700;font-size:13px;
+    cursor:pointer;background:var(--primary);color:#fff;
+  }
+  .btn.secondary{background:#e2e8f0;color:var(--text);}
+  .btn.danger{background:var(--danger);color:#fff;}
+  .btn.outline{background:transparent;border:1px solid var(--primary);color:var(--primary);}
+  .btn.block{width:100%;margin-top:14px;}
+  .btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+
+  .pica-box{border:1px dashed var(--primary);border-radius:10px;padding:12px;background:#f0fdfa;margin-top:8px;}
+  .pica-box h4{margin:0 0 8px;font-size:13px;color:var(--primary-dark);}
+
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th,td{padding:8px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top;}
+  th{background:#f0fdfa;color:var(--primary-dark);font-size:11px;text-transform:uppercase;}
+  .badge{padding:3px 8px;border-radius:20px;font-size:11px;font-weight:700;color:#fff;display:inline-block;}
+  .badge.tercapai{background:#16a34a;}
+  .badge.sebagian{background:#f59e0b;}
+  .badge.tidak{background:#dc2626;}
+  .progress-bar{height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;margin-top:4px;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),#14b8a6);}
+
+  .filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+  .filter-row select,.filter-row input{width:auto;flex:1;min-width:120px;}
+
+  .action-icons{display:flex;gap:6px;}
+  .action-icons button{
+    border:none;background:#f1f5f9;padding:6px 9px;border-radius:8px;cursor:pointer;font-size:12px;
+  }
+
+  canvas.sigpad{
+    border:1px solid var(--border);border-radius:10px;width:100%;height:150px;
+    touch-action:none;background:#fff;
+  }
+  .approval-grid{display:grid;grid-template-columns:1fr;gap:16px;}
+  @media(min-width:700px){.approval-grid{grid-template-columns:1fr 1fr 1fr;}}
+  .approval-item{border:1px solid var(--border);border-radius:12px;padding:12px;background:#fafffe;}
+  .approval-item h4{margin:0 0 8px;font-size:13px;color:var(--primary-dark);}
 
   .modal-bg{
-    position:fixed; inset:0; background:rgba(28,43,57,.55); backdrop-filter:blur(2px);
-    display:none; align-items:center; justify-content:center; z-index:100; padding:16px;
+    position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;
+    align-items:center;justify-content:center;z-index:200;padding:16px;
   }
   .modal-bg.show{display:flex;}
-  .modal{
-    background:var(--paper); border-radius:14px; max-width:480px; width:100%;
-    max-height:88vh; overflow-y:auto; padding:26px; box-shadow:0 20px 60px rgba(0,0,0,.3);
-  }
-  .modal h2{font-family:'Fraunces',serif; font-size:21px; margin:0 0 4px;}
-  .modal .desc{font-size:13px; color:var(--muted); margin-bottom:18px;}
-  .field{margin-bottom:14px;}
-  .field label{display:block; font-size:12.5px; font-weight:600; margin-bottom:6px; color:var(--ink-2);}
-  .field input, .field select, .field textarea{
-    width:100%; padding:10px 12px; border-radius:7px; border:1px solid var(--line);
-    font-family:'Inter'; font-size:14px; background:#fff;
-  }
-  .field textarea{resize:vertical; min-height:60px;}
-  .row2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
-  .modal-actions{display:flex; gap:10px; margin-top:18px;}
-  .btn{
-    flex:1; padding:11px; border-radius:8px; border:none; font-weight:600; font-size:14px; cursor:pointer;
-  }
-  .btn-primary{background:var(--ink); color:#fff;}
-  .btn-primary:hover{background:var(--ink-2);}
-  .btn-ghost{background:var(--concrete); color:var(--ink-2);}
-  .btn-ghost:hover{background:var(--concrete-2);}
-  .close-x{position:absolute; top:16px; right:16px; background:none; border:none; cursor:pointer; opacity:.5; font-size:20px;}
-  .close-x:hover{opacity:1;}
-  .modal{position:relative;}
-
-  .admin-bar{
-    background:#fff7ec; border:1px solid #E9CFA6; border-radius:10px;
-    padding:10px 14px; font-size:12.5px; color:var(--amber-dark); margin-bottom:16px;
-    display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;
-  }
-  .admin-bar b{font-weight:700;}
-  .admin-bar-actions{display:flex; gap:8px;}
-  .mini-btn{
-    font-size:12px; font-weight:600; padding:6px 10px; border-radius:6px; border:1px solid #E9CFA6;
-    background:#fff; color:var(--amber-dark); cursor:pointer;
-  }
+  .modal-box{background:#fff;border-radius:14px;padding:20px;max-width:340px;width:100%;text-align:center;}
+  .modal-box input{text-align:center;letter-spacing:6px;font-size:20px;margin-top:10px;}
 
   .toast{
-    position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(100px);
-    background:var(--ink); color:#fff; padding:12px 20px; border-radius:8px; font-size:13.5px;
-    z-index:200; transition:transform .25s ease; box-shadow:0 6px 20px rgba(0,0,0,.3);
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+    background:#1f2937;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;
+    z-index:300;opacity:0;transition:opacity .3s;pointer-events:none;
   }
-  .toast.show{transform:translateX(-50%) translateY(0);}
+  .toast.show{opacity:1;}
 
-  footer{text-align:center; padding:20px; font-size:11.5px; color:var(--muted);}
+  footer.made-by{text-align:center;font-size:11px;color:var(--muted);margin-top:20px;padding:10px;}
 
-  @media(max-width:640px){
-    .statbar{grid-template-columns:repeat(2,1fr);}
-    .row2{grid-template-columns:1fr;}
+  .empty-state{text-align:center;padding:30px;color:var(--muted);font-size:13px;}
+  .sync-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;}
+  .sync-dot.on{background:#4ade80;}
+  .sync-dot.off{background:#f87171;}
+
+  /* LOGIN OVERLAY */
+  #loginOverlay{
+    position:fixed;inset:0;z-index:500;
+    background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+    display:flex;align-items:center;justify-content:center;padding:20px;
   }
+  .login-card{
+    background:#fff;border-radius:18px;padding:30px 26px;max-width:340px;width:100%;
+    text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.25);
+  }
+  .login-logo{
+    width:70px;height:70px;border-radius:16px;background:var(--primary-light);
+    display:flex;align-items:center;justify-content:center;margin:0 auto 14px;overflow:hidden;
+  }
+  .login-logo img{width:100%;height:100%;object-fit:cover;}
+  .login-card h2{margin:0 0 4px;font-size:16px;color:var(--primary-dark);}
+  .login-card p{margin:0 0 16px;font-size:12px;color:var(--muted);}
+  .login-card input{text-align:center;font-size:18px;letter-spacing:4px;}
+  .login-error{color:var(--danger);font-size:12px;margin-top:8px;min-height:16px;}
+  #appContent{display:none;}
 </style>
 </head>
 <body>
 
-<header class="top">
-  <div class="top-inner">
-    <div class="eyebrow"><span class="dot"></span> PT INDOCEMENT TUNGGAL PRAKARSA TBK &mdash; PLANT TARJUN</div>
-    <h1>Monitor Peraturan Perundang-undangan</h1>
-    <p class="subtitle">Pemantauan otomatis regulasi pemerintah yang berkaitan langsung dengan industri semen — perindustrian, lingkungan, energi/pertambangan, dan keselamatan kerja.</p>
+<!-- LOGIN OVERLAY -->
+<div id="loginOverlay">
+  <div class="login-card">
+    <div class="login-logo" id="loginLogoBox"><span style="font-size:11px;color:#0f766e">Logo<br>PPG</span></div>
+    <h2>Program Penggerak Pembina Generus</h2>
+    <p>Daerah Kotabaru &mdash; Akses Terbatas</p>
+    <input type="password" id="loginPassInput" placeholder="Masukkan Password" maxlength="20" onkeydown="if(event.key==='Enter') doLogin()">
+    <button class="btn block" onclick="doLogin()">🔓 Masuk</button>
+    <div class="login-error" id="loginError"></div>
   </div>
+</div>
+
+<div id="appContent">
+
+<header class="app-header">
+  <div class="logo-box" id="logoBox" onclick="document.getElementById('logoInput').click()">
+    <span>Logo<br>PPG</span>
+  </div>
+  <input type="file" id="logoInput" accept="image/*" style="display:none" onchange="handleLogoUpload(event)">
+  <div class="header-titles">
+    <h1>Program Penggerak Pembina Generus</h1>
+    <p>Daerah Kotabaru</p>
+  </div>
+  <select class="tahun-select" id="tahunSelect" onchange="onTahunChange()"></select>
+  <button class="tahun-select" style="cursor:pointer" onclick="logoutApp()" title="Kunci Aplikasi">🔒</button>
 </header>
 
-<div class="statbar" id="statbar">
-  <div class="stat"><div class="n" id="statTotal">0</div><div class="l">Total Peraturan</div></div>
-  <div class="stat new"><div class="n" id="statBaru">0</div><div class="l">Baru (belum dibaca)</div></div>
-  <div class="stat"><div class="n" id="statMinggu">0</div><div class="l">7 Hari Terakhir</div></div>
-  <div class="stat"><div class="n" id="statSumber">4</div><div class="l">Sumber Dipantau</div></div>
-</div>
+<nav class="tabs">
+  <button class="active" onclick="switchTab('dashboard',this)">📊 Dashboard</button>
+  <button onclick="switchTab('input',this)">➕ Input Program</button>
+  <button onclick="switchTab('data',this)">📋 Data Program</button>
+  <button onclick="switchTab('approval',this)">✅ Approval</button>
+  <button onclick="switchTab('settings',this)">⚙️ Pengaturan</button>
+</nav>
 
 <main>
 
-  <div id="adminBar" class="admin-bar" style="display:none;">
-    <span>🔓 Mode Admin aktif</span>
-    <div class="admin-bar-actions">
-      <button class="mini-btn" onclick="openAddModal()">+ Tambah Manual</button>
-      <button class="mini-btn" onclick="markAllRead()">Tandai Semua Dibaca</button>
-      <button class="mini-btn" onclick="exportPDF()">Export PDF</button>
-      <button class="mini-btn" onclick="logoutAdmin()">Keluar</button>
+  <!-- DASHBOARD -->
+  <section id="tab-dashboard">
+    <div class="card">
+      <h2>📊 Ringkasan Tahun <span id="dashTahunLabel"></span></h2>
+      <div class="grid-stats">
+        <div class="stat-box"><div class="value" id="statTotalProgram">0</div><div class="label">Total Program</div></div>
+        <div class="stat-box"><div class="value" id="statTotalBidang">0</div><div class="label">Jumlah Bidang</div></div>
+        <div class="stat-box"><div class="value" id="statBudget">Rp 0</div><div class="label">Total Budget</div></div>
+        <div class="stat-box highlight"><div class="value" id="statAkumulasi">0%</div><div class="label">Akumulasi Pencapaian 1 Tahun</div></div>
+      </div>
     </div>
-  </div>
 
-  <div class="controls">
-    <div class="search">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-      <input type="text" id="searchInput" placeholder="Cari judul peraturan..." oninput="render()">
+    <div class="card">
+      <h2>📅 Capaian per Bulan</h2>
+      <div id="chartBulan"></div>
     </div>
-  </div>
 
-  <div class="chips" id="chips">
-    <button class="chip active" data-cat="semua" onclick="setCategory('semua')">Semua</button>
-    <button class="chip" data-cat="perindustrian" onclick="setCategory('perindustrian')">Perindustrian</button>
-    <button class="chip" data-cat="lingkungan" onclick="setCategory('lingkungan')">Lingkungan</button>
-    <button class="chip" data-cat="esdm" onclick="setCategory('esdm')">ESDM</button>
-    <button class="chip" data-cat="k3" onclick="setCategory('k3')">K3</button>
-    <button class="chip" data-cat="lainnya" onclick="setCategory('lainnya')">Lainnya</button>
-  </div>
+    <div class="card">
+      <h2>🏷️ Capaian per Bidang</h2>
+      <div id="chartBidang"></div>
+    </div>
+  </section>
 
-  <div style="height:14px;"></div>
+  <!-- INPUT -->
+  <section id="tab-input" style="display:none">
+    <div class="card">
+      <h2>➕ Input Program Baru</h2>
+      <input type="hidden" id="editId">
+      <label>Nama Bidang</label>
+      <select id="fBidang">
+        <option value="">-- Pilih Bidang --</option>
+        <option>Tenaga Pendidik</option>
+        <option>Kurikulum</option>
+        <option>Bimbingan Konseling</option>
+        <option>Kegiatan Muda Mudi</option>
+        <option>Kemandirian</option>
+        <option>Olahraga & Seni</option>
+        <option>Keputrian</option>
+        <option>Pengurus Harian PPG</option>
+        <option value="__custom">✏️ Lainnya (isi manual)</option>
+      </select>
+      <input type="text" id="fBidangCustom" placeholder="Tulis nama bidang lain..." style="display:none;margin-top:6px">
 
-  <div class="list" id="list"></div>
+      <label>Nama Program</label>
+      <input type="text" id="fNamaProgram" placeholder="Contoh: Pelatihan Tilawah Generus">
 
-  <div class="empty" id="emptyState" style="display:none;">
-    <div class="big">Belum ada peraturan yang cocok</div>
-    <div>Coba ubah kata kunci pencarian atau kategori filter.</div>
-  </div>
+      <div class="row2">
+        <div>
+          <label>Bulan Program</label>
+          <select id="fBulan">
+            <option value="Januari">Januari</option><option value="Februari">Februari</option>
+            <option value="Maret">Maret</option><option value="April">April</option>
+            <option value="Mei">Mei</option><option value="Juni">Juni</option>
+            <option value="Juli">Juli</option><option value="Agustus">Agustus</option>
+            <option value="September">September</option><option value="Oktober">Oktober</option>
+            <option value="November">November</option><option value="Desember">Desember</option>
+          </select>
+        </div>
+        <div>
+          <label>Status Capaian</label>
+          <select id="fStatus" onchange="onStatusChange()">
+            <option value="Tercapai">✅ Tercapai</option>
+            <option value="Sebagian">🟡 Sebagian</option>
+            <option value="Tidak Tercapai">🔴 Tidak Tercapai</option>
+          </select>
+        </div>
+      </div>
+
+      <label>Realisasi Program (deskripsi pelaksanaan)</label>
+      <textarea id="fRealisasi" placeholder="Jelaskan realisasi pelaksanaan program..."></textarea>
+
+      <label>Persentase Pencapaian Program Ini (%)</label>
+      <input type="number" id="fPersentase" min="0" max="100" value="100" oninput="clampPercent(this)">
+
+      <div class="row2">
+        <div>
+          <label>Budget Rencana (Rp)</label>
+          <input type="number" id="fBudgetRencana" placeholder="0">
+        </div>
+        <div>
+          <label>Budget Realisasi (Rp)</label>
+          <input type="number" id="fBudgetRealisasi" placeholder="0">
+        </div>
+      </div>
+
+      <div class="pica-box">
+        <h4>🔍 PICA (Problem Identification & Corrective Action)</h4>
+        <label>Problem (Permasalahan yang muncul)</label>
+        <textarea id="fPicaProblem" placeholder="Kendala/masalah saat pelaksanaan (kosongkan jika tidak ada)"></textarea>
+        <label>Identification (Identifikasi Penyebab)</label>
+        <textarea id="fPicaIdentifikasi" placeholder="Analisa akar penyebab masalah"></textarea>
+        <label>Corrective Action (Tindakan Perbaikan)</label>
+        <textarea id="fPicaAction" placeholder="Rencana/tindakan perbaikan ke depan"></textarea>
+        <label>Penanggung Jawab Tindak Lanjut</label>
+        <input type="text" id="fPicaPic" placeholder="Nama PIC">
+      </div>
+
+      <div class="btn-row">
+        <button class="btn block" onclick="saveProgram()">💾 Simpan Program</button>
+        <button class="btn secondary block" onclick="resetForm()">↺ Reset Form</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- DATA -->
+  <section id="tab-data" style="display:none">
+    <div class="card">
+      <h2>📋 Data Program Tahun <span id="dataTahunLabel"></span></h2>
+      <div class="filter-row">
+        <select id="filterBidang" onchange="renderProgramList()"><option value="">Semua Bidang</option></select>
+        <select id="filterBulan" onchange="renderProgramList()">
+          <option value="">Semua Bulan</option>
+          <option>Januari</option><option>Februari</option><option>Maret</option><option>April</option>
+          <option>Mei</option><option>Juni</option><option>Juli</option><option>Agustus</option>
+          <option>September</option><option>Oktober</option><option>November</option><option>Desember</option>
+        </select>
+        <input type="text" id="searchProgram" placeholder="Cari nama program..." oninput="renderProgramList()">
+      </div>
+      <div style="overflow-x:auto">
+        <table id="dataTable">
+          <thead><tr>
+            <th>Bidang</th><th>Program</th><th>Bulan</th><th>Status</th><th>%</th><th>Budget</th><th>Aksi</th>
+          </tr></thead>
+          <tbody id="dataTableBody"></tbody>
+        </table>
+      </div>
+      <div id="dataEmpty" class="empty-state" style="display:none">Belum ada data program untuk tahun ini.</div>
+    </div>
+  </section>
+
+  <!-- APPROVAL -->
+  <section id="tab-approval" style="display:none">
+    <div class="card">
+      <h2>✅ Approval Laporan Tahun <span id="approvalTahunLabel"></span></h2>
+      <p style="font-size:13px;color:var(--muted)">
+        Total <b id="approvalTotalProgram">0</b> program &bull; Akumulasi pencapaian
+        <b id="approvalAkumulasi">0%</b> selama 1 tahun.
+      </p>
+
+      <div class="approval-grid">
+        <div class="approval-item">
+          <h4>✍️ Dibuat Oleh (Sekretaris PPG)</h4>
+          <input type="text" id="sekNama" placeholder="Nama Sekretaris PPG">
+          <label>Tanda Tangan</label>
+          <canvas class="sigpad" id="sigSekretaris"></canvas>
+          <button class="btn secondary" style="margin-top:6px;width:100%" onclick="clearSig('sigSekretaris')">Hapus TTD</button>
+        </div>
+        <div class="approval-item">
+          <h4>📢 Dilaporkan Oleh (Ketua PPG)</h4>
+          <input type="text" id="ketuaNama" placeholder="Nama Ketua PPG">
+          <label>Tanda Tangan</label>
+          <canvas class="sigpad" id="sigKetua"></canvas>
+          <button class="btn secondary" style="margin-top:6px;width:100%" onclick="clearSig('sigKetua')">Hapus TTD</button>
+        </div>
+        <div class="approval-item">
+          <h4>🕌 Disetujui Oleh (Kyai Daerah)</h4>
+          <input type="text" id="kyaiNama" placeholder="Nama Kyai Daerah">
+          <label>Tanda Tangan</label>
+          <canvas class="sigpad" id="sigKyai"></canvas>
+          <button class="btn secondary" style="margin-top:6px;width:100%" onclick="clearSig('sigKyai')">Hapus TTD</button>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn block" onclick="saveApproval()">💾 Simpan Approval</button>
+        <button class="btn outline block" onclick="generatePDF()">📄 Export Laporan PDF</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section id="tab-settings" style="display:none">
+    <div class="card">
+      <h2>⚙️ Pengaturan</h2>
+
+      <label>Logo PPG</label>
+      <div class="btn-row">
+        <button class="btn secondary" onclick="document.getElementById('logoInput').click()">🖼️ Ganti Logo</button>
+        <button class="btn danger" onclick="removeLogo()">🗑️ Hapus Logo</button>
+      </div>
+
+      <label style="margin-top:20px">🔥 Sinkronisasi Firebase (opsional)</label>
+      <p style="font-size:12px;color:var(--muted);margin:0 0 6px">
+        <span class="sync-dot" id="syncDot"></span><span id="syncStatus">Belum terhubung</span>
+      </p>
+      <input type="text" id="fbUrl" placeholder="https://nama-project-default-rtdb.firebaseio.com">
+      <div class="btn-row">
+        <button class="btn" onclick="connectFirebase()">🔗 Simpan & Hubungkan</button>
+        <button class="btn secondary" onclick="pullFromFirebase()">⬇️ Tarik Data</button>
+        <button class="btn secondary" onclick="pushToFirebase()">⬆️ Kirim Data</button>
+      </div>
+
+      <label style="margin-top:20px">🔒 Ubah Password Buka Aplikasi</label>
+      <p style="font-size:12px;color:var(--muted);margin:0 0 6px">Password ini diminta setiap kali aplikasi dibuka, agar tidak semua orang bisa mengakses.</p>
+      <div class="row2">
+        <input type="password" id="newAppPass1" placeholder="Password Baru">
+        <input type="password" id="newAppPass2" placeholder="Ulangi Password Baru">
+      </div>
+      <button class="btn secondary block" onclick="changeAppPassword()">Simpan Password Aplikasi</button>
+
+      <label style="margin-top:20px">🔑 Ubah PIN Admin</label>
+      <p style="font-size:12px;color:var(--muted);margin:0 0 6px">PIN ini diminta khusus saat menghapus data / restore backup.</p>
+      <div class="row2">
+        <input type="password" id="newPin1" placeholder="PIN Baru (6 digit)">
+        <input type="password" id="newPin2" placeholder="Ulangi PIN Baru">
+      </div>
+      <button class="btn secondary block" onclick="changePin()">Simpan PIN Baru</button>
+
+      <label style="margin-top:20px">💾 Backup / Restore Data</label>
+      <div class="btn-row">
+        <button class="btn secondary" onclick="exportBackup()">⬇️ Export Backup (JSON)</button>
+        <button class="btn secondary" onclick="document.getElementById('restoreInput').click()">⬆️ Restore Backup</button>
+      </div>
+      <input type="file" id="restoreInput" accept=".json" style="display:none" onchange="restoreBackup(event)">
+    </div>
+  </section>
 
 </main>
 
-<footer>Data disinkronkan otomatis via Google Alerts + GitHub Actions &middot; Firebase Realtime Database</footer>
+<footer class="made-by">Made by Suryana &mdash; Program Penggerak Pembina Generus Daerah Kotabaru</footer>
 
-<button class="fab" id="fabBtn" onclick="handleFabClick()">🔒 Admin</button>
+</div><!-- /appContent -->
 
-<!-- Modal: Login Admin -->
-<div class="modal-bg" id="loginModalBg">
-  <div class="modal">
-    <button class="close-x" onclick="closeModal('loginModalBg')">✕</button>
-    <h2>Masuk sebagai Admin</h2>
-    <p class="desc">Masukkan PIN admin untuk menambah, mengedit, atau menghapus peraturan secara manual.</p>
-    <div class="field">
-      <label>PIN Admin</label>
-      <input type="password" id="pinInput" placeholder="••••••" maxlength="10">
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="closeModal('loginModalBg')">Batal</button>
-      <button class="btn btn-primary" onclick="checkPin()">Masuk</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal: Tambah Peraturan Manual -->
-<div class="modal-bg" id="addModalBg">
-  <div class="modal">
-    <button class="close-x" onclick="closeModal('addModalBg')">✕</button>
-    <h2>Tambah Peraturan Manual</h2>
-    <p class="desc">Gunakan ini jika ada peraturan yang belum tertangkap oleh pemantauan otomatis.</p>
-    <div class="field">
-      <label>Judul Peraturan</label>
-      <textarea id="fJudul" placeholder="Contoh: Peraturan Menteri Perindustrian No. 12 Tahun 2026 tentang ..."></textarea>
-    </div>
-    <div class="row2">
-      <div class="field">
-        <label>Kategori</label>
-        <select id="fKategori">
-          <option value="perindustrian">Perindustrian</option>
-          <option value="lingkungan">Lingkungan</option>
-          <option value="esdm">ESDM</option>
-          <option value="k3">K3</option>
-          <option value="lainnya">Lainnya</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Tanggal Terbit</label>
-        <input type="date" id="fTanggal">
-      </div>
-    </div>
-    <div class="field">
-      <label>Sumber</label>
-      <input type="text" id="fSumber" placeholder="Contoh: JDIH Kementerian Perindustrian">
-    </div>
-    <div class="field">
-      <label>Link Dokumen</label>
-      <input type="text" id="fLink" placeholder="https://...">
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="closeModal('addModalBg')">Batal</button>
-      <button class="btn btn-primary" onclick="saveManualEntry()">Simpan</button>
+<!-- PIN MODAL -->
+<div class="modal-bg" id="pinModal">
+  <div class="modal-box">
+    <h3>🔒 Masukkan PIN Admin</h3>
+    <input type="password" id="pinInput" maxlength="6" placeholder="••••••">
+    <div class="btn-row" style="justify-content:center">
+      <button class="btn" onclick="submitPin()">Konfirmasi</button>
+      <button class="btn secondary" onclick="closePinModal()">Batal</button>
     </div>
   </div>
 </div>
@@ -333,268 +455,662 @@
 <div class="toast" id="toast"></div>
 
 <script>
-/* ================== KONFIGURASI ================== */
-/* Ganti dengan URL Firebase Realtime Database Bapak (tanpa tanda / di akhir) */
-const FIREBASE_URL = "https://sosialisasi-5992c-default-rtdb.asia-southeast1.firebasedatabase.app";
-/* Ganti PIN default sebelum deploy ke produksi */
-const ADMIN_PIN = "159753";
-/* ==================================================== */
+/* ============ DATA & STATE ============ */
+const STORAGE_KEY = 'ppgDaerahData';
+let DB = loadData();
+let currentTab = 'dashboard';
+let pendingAction = null;
+let sigPads = {};
 
-let allData = {};        // { key: {judul, kategori, ...} }
-let activeCategory = "semua";
-let isAdmin = false;
+function loadData(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(raw){
+    try{ return JSON.parse(raw); }catch(e){}
+  }
+  return {
+    programs: [],
+    approvals: {},
+    settings: { pin: '159753', appPassword: 'ppgkotabaru', logo: '', firebaseUrl: 'https://data-unik-default-rtdb.asia-southeast1.firebasedatabase.app' }
+  };
+}
+function saveData(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(DB));
+}
 
-const catLabel = {
-  perindustrian: "Perindustrian",
-  lingkungan: "Lingkungan",
-  esdm: "ESDM",
-  k3: "K3",
-  lainnya: "Lainnya"
+/* ============ LOGIN GATE ============ */
+const SESSION_KEY = 'ppgDaerahAuthed';
+
+function checkLogin(){
+  if(!DB.settings.appPassword){ DB.settings.appPassword = 'ppgkotabaru'; saveData(); }
+  // tampilkan logo di layar login jika ada
+  const loginLogoBox = document.getElementById('loginLogoBox');
+  if(DB.settings.logo){ loginLogoBox.innerHTML = '<img src="'+DB.settings.logo+'">'; }
+
+  if(sessionStorage.getItem(SESSION_KEY) === 'true'){
+    grantAccess();
+  } else {
+    document.getElementById('loginOverlay').style.display = 'flex';
+    document.getElementById('appContent').style.display = 'none';
+    setTimeout(()=>document.getElementById('loginPassInput').focus(),200);
+  }
+}
+function doLogin(){
+  const val = document.getElementById('loginPassInput').value;
+  const err = document.getElementById('loginError');
+  if(val === DB.settings.appPassword){
+    sessionStorage.setItem(SESSION_KEY, 'true');
+    err.textContent = '';
+    grantAccess();
+  } else {
+    err.textContent = '❌ Password salah, silakan coba lagi';
+    document.getElementById('loginPassInput').value = '';
+    document.getElementById('loginPassInput').focus();
+  }
+}
+function grantAccess(){
+  document.getElementById('loginOverlay').style.display = 'none';
+  document.getElementById('appContent').style.display = 'block';
+  initApp();
+}
+function logoutApp(){
+  sessionStorage.removeItem(SESSION_KEY);
+  location.reload();
+}
+function changeAppPassword(){
+  const p1 = document.getElementById('newAppPass1').value;
+  const p2 = document.getElementById('newAppPass2').value;
+  if(p1.length < 4){ showToast('Password minimal 4 karakter'); return; }
+  if(p1 !== p2){ showToast('Password tidak sama'); return; }
+  DB.settings.appPassword = p1;
+  saveData();
+  document.getElementById('newAppPass1').value = '';
+  document.getElementById('newAppPass2').value = '';
+  showToast('✅ Password aplikasi berhasil diubah');
+}
+
+/* ============ INIT ============ */
+window.onload = function(){
+  checkLogin();
 };
+function initApp(){
+  initTahunSelect();
+  loadLogo();
+  loadFirebaseUrl();
+  renderBidangFilterOptions();
+  renderAll();
+  setTimeout(()=>{ initAllSigPads(); loadApprovalForYear(); }, 200);
+}
 
+function initTahunSelect(){
+  const sel = document.getElementById('tahunSelect');
+  const nowYear = new Date().getFullYear();
+  sel.innerHTML = '';
+  for(let y = nowYear + 1; y >= nowYear - 4; y--){
+    const opt = document.createElement('option');
+    opt.value = y; opt.textContent = y;
+    if(y === nowYear) opt.selected = true;
+    sel.appendChild(opt);
+  }
+}
+function getTahun(){ return parseInt(document.getElementById('tahunSelect').value); }
+function onTahunChange(){
+  renderAll();
+  loadApprovalForYear();
+}
+
+/* ============ TABS ============ */
+function switchTab(tab, btn){
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  ['dashboard','input','data','approval','settings'].forEach(t=>{
+    document.getElementById('tab-'+t).style.display = (t===tab)?'block':'none';
+  });
+  currentTab = tab;
+  if(tab === 'data') renderProgramList();
+  if(tab === 'dashboard') renderDashboard();
+  if(tab === 'approval') { renderApprovalSummary(); setTimeout(initAllSigPads,100); loadApprovalForYear(); }
+}
+
+/* ============ TOAST ============ */
 function showToast(msg){
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 2600);
+  setTimeout(()=>t.classList.remove('show'), 2200);
 }
 
-function openModal(id){ document.getElementById(id).classList.add('show'); }
-function closeModal(id){ document.getElementById(id).classList.remove('show'); }
-
-/* ---------- Firebase REST helpers ---------- */
-async function fbGet(path){
-  const res = await fetch(`${FIREBASE_URL}/${path}.json`);
-  if(!res.ok) throw new Error('Gagal memuat data dari Firebase');
-  return res.json();
+/* ============ LOGO ============ */
+function handleLogoUpload(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    DB.settings.logo = ev.target.result;
+    saveData();
+    loadLogo();
+    showToast('Logo berhasil diperbarui');
+  };
+  reader.readAsDataURL(file);
 }
-async function fbPut(path, data){
-  const res = await fetch(`${FIREBASE_URL}/${path}.json`, {
-    method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data)
-  });
-  return res.ok;
-}
-async function fbPatch(path, data){
-  const res = await fetch(`${FIREBASE_URL}/${path}.json`, {
-    method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data)
-  });
-  return res.ok;
-}
-async function fbDelete(path){
-  const res = await fetch(`${FIREBASE_URL}/${path}.json`, { method:'DELETE' });
-  return res.ok;
-}
-
-/* ---------- Load & render ---------- */
-async function loadData(){
-  try{
-    const data = await fbGet('peraturan');
-    allData = data || {};
-    render();
-    updateStats();
-  }catch(e){
-    console.error(e);
-    showToast('⚠️ Gagal memuat data. Cek koneksi Firebase.');
+function loadLogo(){
+  const box = document.getElementById('logoBox');
+  const loginBox = document.getElementById('loginLogoBox');
+  if(DB.settings.logo){
+    box.innerHTML = '<img src="'+DB.settings.logo+'">';
+    if(loginBox) loginBox.innerHTML = '<img src="'+DB.settings.logo+'">';
+  } else {
+    box.innerHTML = '<span>Logo<br>PPG</span>';
+    if(loginBox) loginBox.innerHTML = '<span style="font-size:11px;color:#0f766e">Logo<br>PPG</span>';
   }
 }
-
-function updateStats(){
-  const items = Object.values(allData);
-  const total = items.length;
-  const baru = items.filter(i => i.status === 'baru').length;
-  const now = new Date();
-  const minggu = items.filter(i => {
-    const d = new Date(i.tanggalMasuk || i.tanggalTerbit || 0);
-    return (now - d) / 86400000 <= 7;
-  }).length;
-  document.getElementById('statTotal').textContent = total;
-  document.getElementById('statBaru').textContent = baru;
-  document.getElementById('statMinggu').textContent = minggu;
+function removeLogo(){
+  DB.settings.logo = '';
+  saveData();
+  loadLogo();
+  showToast('Logo dihapus');
 }
 
-function setCategory(cat){
-  activeCategory = cat;
-  document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('active', c.dataset.cat===cat));
-  render();
+/* ============ PIN PROTECTION ============ */
+function requirePin(action){
+  pendingAction = action;
+  document.getElementById('pinInput').value = '';
+  document.getElementById('pinModal').classList.add('show');
+  setTimeout(()=>document.getElementById('pinInput').focus(),100);
+}
+function closePinModal(){
+  document.getElementById('pinModal').classList.remove('show');
+  pendingAction = null;
+}
+function submitPin(){
+  const val = document.getElementById('pinInput').value;
+  if(val === DB.settings.pin){
+    closePinModal();
+    if(pendingAction) pendingAction();
+    pendingAction = null;
+  } else {
+    showToast('❌ PIN salah');
+  }
+}
+function changePin(){
+  const p1 = document.getElementById('newPin1').value;
+  const p2 = document.getElementById('newPin2').value;
+  if(p1.length !== 6 || !/^\d{6}$/.test(p1)){ showToast('PIN harus 6 digit angka'); return; }
+  if(p1 !== p2){ showToast('PIN tidak sama'); return; }
+  DB.settings.pin = p1;
+  saveData();
+  document.getElementById('newPin1').value='';
+  document.getElementById('newPin2').value='';
+  showToast('✅ PIN berhasil diubah');
 }
 
-function getFiltered(){
-  const q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
-  return Object.entries(allData)
-    .filter(([key, it]) => {
-      if(activeCategory !== 'semua' && it.kategori !== activeCategory) return false;
-      if(q && !(it.judul||'').toLowerCase().includes(q)) return false;
-      return true;
-    })
-    .sort((a,b) => new Date(b[1].tanggalTerbit||b[1].tanggalMasuk||0) - new Date(a[1].tanggalTerbit||a[1].tanggalMasuk||0));
+/* ============ FORM HELPERS ============ */
+document.getElementById('fBidang').addEventListener('change', function(){
+  document.getElementById('fBidangCustom').style.display = (this.value === '__custom') ? 'block' : 'none';
+});
+function onStatusChange(){
+  const status = document.getElementById('fStatus').value;
+  const p = document.getElementById('fPersentase');
+  if(status === 'Tercapai') p.value = 100;
+  else if(status === 'Tidak Tercapai') p.value = 0;
+}
+function clampPercent(el){
+  let v = parseInt(el.value)||0;
+  if(v>100) v=100; if(v<0) v=0;
+  el.value = v;
 }
 
-function fmtDate(iso){
-  if(!iso) return '-';
-  const d = new Date(iso);
-  if(isNaN(d)) return iso;
-  return d.toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
+/* ============ SAVE / EDIT / DELETE PROGRAM ============ */
+function saveProgram(){
+  let bidang = document.getElementById('fBidang').value;
+  if(bidang === '__custom') bidang = document.getElementById('fBidangCustom').value.trim();
+  const nama = document.getElementById('fNamaProgram').value.trim();
+  if(!bidang || !nama){ showToast('Bidang & Nama Program wajib diisi'); return; }
+
+  const entry = {
+    id: document.getElementById('editId').value || ('p'+Date.now()),
+    tahun: getTahun(),
+    bidang: bidang,
+    namaProgram: nama,
+    bulan: document.getElementById('fBulan').value,
+    status: document.getElementById('fStatus').value,
+    realisasi: document.getElementById('fRealisasi').value.trim(),
+    persentase: parseInt(document.getElementById('fPersentase').value)||0,
+    budgetRencana: parseFloat(document.getElementById('fBudgetRencana').value)||0,
+    budgetRealisasi: parseFloat(document.getElementById('fBudgetRealisasi').value)||0,
+    pica: {
+      problem: document.getElementById('fPicaProblem').value.trim(),
+      identifikasi: document.getElementById('fPicaIdentifikasi').value.trim(),
+      action: document.getElementById('fPicaAction').value.trim(),
+      pic: document.getElementById('fPicaPic').value.trim()
+    },
+    updatedAt: Date.now()
+  };
+
+  const idx = DB.programs.findIndex(p=>p.id===entry.id);
+  if(idx>=0) DB.programs[idx] = entry;
+  else DB.programs.push(entry);
+
+  saveData();
+  showToast('✅ Program berhasil disimpan');
+  resetForm();
+  renderAll();
+  switchTab('data', document.querySelectorAll('nav.tabs button')[2]);
 }
 
-function render(){
-  const filtered = getFiltered();
-  const list = document.getElementById('list');
-  const empty = document.getElementById('emptyState');
+function resetForm(){
+  document.getElementById('editId').value = '';
+  document.getElementById('fBidang').value = '';
+  document.getElementById('fBidangCustom').value = '';
+  document.getElementById('fBidangCustom').style.display = 'none';
+  document.getElementById('fNamaProgram').value = '';
+  document.getElementById('fBulan').value = 'Januari';
+  document.getElementById('fStatus').value = 'Tercapai';
+  document.getElementById('fRealisasi').value = '';
+  document.getElementById('fPersentase').value = 100;
+  document.getElementById('fBudgetRencana').value = '';
+  document.getElementById('fBudgetRealisasi').value = '';
+  document.getElementById('fPicaProblem').value = '';
+  document.getElementById('fPicaIdentifikasi').value = '';
+  document.getElementById('fPicaAction').value = '';
+  document.getElementById('fPicaPic').value = '';
+}
 
-  if(filtered.length === 0){
-    list.innerHTML = '';
+function editProgram(id){
+  const p = DB.programs.find(x=>x.id===id);
+  if(!p) return;
+  document.getElementById('editId').value = p.id;
+  const bidangSel = document.getElementById('fBidang');
+  const found = Array.from(bidangSel.options).some(o=>o.value===p.bidang);
+  if(found){ bidangSel.value = p.bidang; document.getElementById('fBidangCustom').style.display='none'; }
+  else { bidangSel.value = '__custom'; document.getElementById('fBidangCustom').style.display='block'; document.getElementById('fBidangCustom').value = p.bidang; }
+  document.getElementById('fNamaProgram').value = p.namaProgram;
+  document.getElementById('fBulan').value = p.bulan;
+  document.getElementById('fStatus').value = p.status;
+  document.getElementById('fRealisasi').value = p.realisasi;
+  document.getElementById('fPersentase').value = p.persentase;
+  document.getElementById('fBudgetRencana').value = p.budgetRencana || '';
+  document.getElementById('fBudgetRealisasi').value = p.budgetRealisasi || '';
+  document.getElementById('fPicaProblem').value = p.pica?.problem || '';
+  document.getElementById('fPicaIdentifikasi').value = p.pica?.identifikasi || '';
+  document.getElementById('fPicaAction').value = p.pica?.action || '';
+  document.getElementById('fPicaPic').value = p.pica?.pic || '';
+  switchTab('input', document.querySelectorAll('nav.tabs button')[1]);
+}
+
+function deleteProgram(id){
+  requirePin(()=>{
+    DB.programs = DB.programs.filter(p=>p.id!==id);
+    saveData();
+    renderAll();
+    showToast('🗑️ Program dihapus');
+  });
+}
+
+/* ============ RENDER ============ */
+function renderAll(){
+  renderDashboard();
+  renderBidangFilterOptions();
+  if(currentTab==='data') renderProgramList();
+  if(currentTab==='approval') renderApprovalSummary();
+}
+
+function programsForYear(){
+  return DB.programs.filter(p=>p.tahun===getTahun());
+}
+
+function renderBidangFilterOptions(){
+  const bidangs = [...new Set(DB.programs.map(p=>p.bidang))];
+  const sel = document.getElementById('filterBidang');
+  const currentVal = sel.value;
+  sel.innerHTML = '<option value="">Semua Bidang</option>' + bidangs.map(b=>`<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('');
+  sel.value = currentVal;
+}
+
+function formatRupiah(num){
+  return 'Rp ' + (num||0).toLocaleString('id-ID');
+}
+
+function renderDashboard(){
+  const list = programsForYear();
+  document.getElementById('dashTahunLabel').textContent = getTahun();
+
+  document.getElementById('statTotalProgram').textContent = list.length;
+  const bidangSet = new Set(list.map(p=>p.bidang));
+  document.getElementById('statTotalBidang').textContent = bidangSet.size;
+  const totalBudget = list.reduce((s,p)=>s+(p.budgetRealisasi||p.budgetRencana||0),0);
+  document.getElementById('statBudget').textContent = formatRupiah(totalBudget);
+
+  const akumulasi = list.length ? Math.round(list.reduce((s,p)=>s+(p.persentase||0),0)/list.length) : 0;
+  document.getElementById('statAkumulasi').textContent = akumulasi + '%';
+
+  const bulanOrder = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  let bulanHtml = '';
+  bulanOrder.forEach(b=>{
+    const items = list.filter(p=>p.bulan===b);
+    if(items.length===0) return;
+    const avg = Math.round(items.reduce((s,p)=>s+(p.persentase||0),0)/items.length);
+    bulanHtml += `<div style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;font-size:12px"><span>${b} (${items.length} program)</span><b>${avg}%</b></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${avg}%"></div></div>
+    </div>`;
+  });
+  document.getElementById('chartBulan').innerHTML = bulanHtml || '<div class="empty-state">Belum ada data</div>';
+
+  const bidangArr = [...bidangSet];
+  let bidangHtml = '';
+  bidangArr.forEach(b=>{
+    const items = list.filter(p=>p.bidang===b);
+    const avg = Math.round(items.reduce((s,p)=>s+(p.persentase||0),0)/items.length);
+    bidangHtml += `<div style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;font-size:12px"><span>${escapeHtml(b)} (${items.length} program)</span><b>${avg}%</b></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${avg}%"></div></div>
+    </div>`;
+  });
+  document.getElementById('chartBidang').innerHTML = bidangHtml || '<div class="empty-state">Belum ada data</div>';
+}
+
+function renderProgramList(){
+  document.getElementById('dataTahunLabel').textContent = getTahun();
+  let list = programsForYear();
+
+  const fB = document.getElementById('filterBidang').value;
+  const fM = document.getElementById('filterBulan').value;
+  const fS = document.getElementById('searchProgram').value.toLowerCase();
+  if(fB) list = list.filter(p=>p.bidang===fB);
+  if(fM) list = list.filter(p=>p.bulan===fM);
+  if(fS) list = list.filter(p=>p.namaProgram.toLowerCase().includes(fS));
+
+  const tbody = document.getElementById('dataTableBody');
+  const empty = document.getElementById('dataEmpty');
+  if(list.length===0){
+    tbody.innerHTML = '';
     empty.style.display = 'block';
     return;
   }
   empty.style.display = 'none';
 
-  list.innerHTML = filtered.map(([key, it]) => `
-    <div class="card">
-      <div class="badges">
-        <span class="badge ${it.kategori||'lainnya'}">${catLabel[it.kategori] || 'Lainnya'}</span>
-        ${it.status === 'baru' ? '<span class="badge baru">Baru</span>' : ''}
-        ${it.ditambahkanOleh === 'admin' ? '<span class="badge manual">Manual</span>' : ''}
-      </div>
-      <p class="judul">${escapeHtml(it.judul||'(Tanpa judul)')}</p>
-      <div class="meta">
-        <span>📅 ${fmtDate(it.tanggalTerbit)}</span>
-        <span>🏛️ ${escapeHtml(it.sumber||'-')}</span>
-      </div>
-      <div class="card-actions">
-        ${it.link ? `<a class="btn-link" href="${escapeAttr(it.link)}" target="_blank" rel="noopener">🔗 Lihat Sumber</a>` : ''}
-        ${it.status === 'baru' ? `<button class="btn-link" onclick="markRead('${key}')">✓ Tandai Dibaca</button>` : ''}
-        ${isAdmin ? `<button class="btn-link btn-danger" onclick="deleteEntry('${key}')">🗑 Hapus</button>` : ''}
-      </div>
-    </div>
+  const statusClass = {'Tercapai':'tercapai','Sebagian':'sebagian','Tidak Tercapai':'tidak'};
+  tbody.innerHTML = list.map(p=>`
+    <tr>
+      <td>${escapeHtml(p.bidang)}</td>
+      <td><b>${escapeHtml(p.namaProgram)}</b>${p.pica?.problem ? '<br><small style="color:#dc2626">⚠️ Ada PICA</small>' : ''}</td>
+      <td>${p.bulan}</td>
+      <td><span class="badge ${statusClass[p.status]||''}">${p.status}</span></td>
+      <td>${p.persentase}%</td>
+      <td>${formatRupiah(p.budgetRealisasi||p.budgetRencana)}</td>
+      <td>
+        <div class="action-icons">
+          <button onclick="editProgram('${p.id}')">✏️</button>
+          <button onclick="deleteProgram('${p.id}')">🗑️</button>
+        </div>
+      </td>
+    </tr>
   `).join('');
 }
 
+function renderApprovalSummary(){
+  const list = programsForYear();
+  document.getElementById('approvalTahunLabel').textContent = getTahun();
+  document.getElementById('approvalTotalProgram').textContent = list.length;
+  const akumulasi = list.length ? Math.round(list.reduce((s,p)=>s+(p.persentase||0),0)/list.length) : 0;
+  document.getElementById('approvalAkumulasi').textContent = akumulasi + '%';
+}
+
 function escapeHtml(str){
-  return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-function escapeAttr(str){ return escapeHtml(str); }
-
-/* ---------- Actions ---------- */
-async function markRead(key){
-  const ok = await fbPatch(`peraturan/${key}`, {status:'dibaca'});
-  if(ok){ allData[key].status='dibaca'; render(); updateStats(); }
+  if(!str) return '';
+  return str.replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
 
-async function markAllRead(){
-  const updates = {};
-  Object.keys(allData).forEach(k => { if(allData[k].status==='baru') updates[`peraturan/${k}/status`] = 'dibaca'; });
-  if(Object.keys(updates).length === 0){ showToast('Tidak ada yang perlu ditandai.'); return; }
-  const res = await fetch(`${FIREBASE_URL}/.json`, {
-    method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify(updates)
+/* ============ SIGNATURE PAD ============ */
+function initAllSigPads(){
+  ['sigSekretaris','sigKetua','sigKyai'].forEach(id=>initSigPad(id));
+}
+function initSigPad(id){
+  const canvas = document.getElementById(id);
+  if(!canvas || sigPads[id]) { redrawSig(id); return; }
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.strokeStyle = '#0f172a';
+  ctx.lineWidth = 2.2;
+  ctx.lineCap = 'round';
+  let drawing = false;
+
+  function getPos(e){
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return { x: clientX-rect.left, y: clientY-rect.top };
+  }
+  function start(e){ drawing=true; const pos=getPos(e); ctx.beginPath(); ctx.moveTo(pos.x,pos.y); e.preventDefault(); }
+  function move(e){ if(!drawing) return; const pos=getPos(e); ctx.lineTo(pos.x,pos.y); ctx.stroke(); e.preventDefault(); }
+  function end(){ drawing=false; }
+
+  canvas.addEventListener('mousedown', start);
+  canvas.addEventListener('mousemove', move);
+  canvas.addEventListener('mouseup', end);
+  canvas.addEventListener('mouseleave', end);
+  canvas.addEventListener('touchstart', start);
+  canvas.addEventListener('touchmove', move);
+  canvas.addEventListener('touchend', end);
+
+  sigPads[id] = true;
+  redrawSig(id);
+}
+function clearSig(id){
+  const canvas = document.getElementById(id);
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+}
+function redrawSig(id){
+  const key = 'sig_'+getTahun()+'_'+id;
+  const data = DB.approvals[key];
+  if(data){
+    const canvas = document.getElementById(id);
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.onload = ()=>{ ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(img,0,0,canvas.width,canvas.height); };
+    img.src = data;
+  }
+}
+
+/* ============ APPROVAL SAVE/LOAD ============ */
+function saveApproval(){
+  const tahun = getTahun();
+  DB.approvals['sekNama_'+tahun] = document.getElementById('sekNama').value;
+  DB.approvals['ketuaNama_'+tahun] = document.getElementById('ketuaNama').value;
+  DB.approvals['kyaiNama_'+tahun] = document.getElementById('kyaiNama').value;
+  ['sigSekretaris','sigKetua','sigKyai'].forEach(id=>{
+    const canvas = document.getElementById(id);
+    DB.approvals['sig_'+tahun+'_'+id] = canvas.toDataURL();
   });
-  if(res.ok){
-    Object.keys(allData).forEach(k => { if(allData[k].status==='baru') allData[k].status='dibaca'; });
-    render(); updateStats();
-    showToast('Semua peraturan ditandai sudah dibaca.');
-  }
+  DB.approvals['tanggal_'+tahun] = new Date().toLocaleDateString('id-ID');
+  saveData();
+  showToast('✅ Approval tersimpan');
+}
+function loadApprovalForYear(){
+  const tahun = getTahun();
+  document.getElementById('sekNama').value = DB.approvals['sekNama_'+tahun] || '';
+  document.getElementById('ketuaNama').value = DB.approvals['ketuaNama_'+tahun] || '';
+  document.getElementById('kyaiNama').value = DB.approvals['kyaiNama_'+tahun] || '';
+  setTimeout(()=>{
+    ['sigSekretaris','sigKetua','sigKyai'].forEach(id=>redrawSig(id));
+  }, 150);
 }
 
-async function deleteEntry(key){
-  if(!confirm('Hapus peraturan ini secara permanen?')) return;
-  const ok = await fbDelete(`peraturan/${key}`);
-  if(ok){ delete allData[key]; render(); updateStats(); showToast('Peraturan dihapus.'); }
-}
-
-/* ---------- Admin: login/logout ---------- */
-function handleFabClick(){
-  if(isAdmin){ openAddModal(); } else { openModal('loginModalBg'); }
-}
-function checkPin(){
-  const val = document.getElementById('pinInput').value;
-  if(val === ADMIN_PIN){
-    isAdmin = true;
-    document.getElementById('adminBar').style.display = 'flex';
-    document.getElementById('fabBtn').textContent = '＋ Tambah';
-    closeModal('loginModalBg');
-    document.getElementById('pinInput').value = '';
-    render();
-    showToast('Berhasil masuk sebagai admin.');
-  } else {
-    showToast('PIN salah.');
-  }
-}
-function logoutAdmin(){
-  isAdmin = false;
-  document.getElementById('adminBar').style.display = 'none';
-  document.getElementById('fabBtn').textContent = '🔒 Admin';
-  render();
-}
-
-/* ---------- Admin: tambah manual ---------- */
-function openAddModal(){
-  document.getElementById('fJudul').value = '';
-  document.getElementById('fKategori').value = 'perindustrian';
-  document.getElementById('fTanggal').value = new Date().toISOString().slice(0,10);
-  document.getElementById('fSumber').value = '';
-  document.getElementById('fLink').value = '';
-  openModal('addModalBg');
-}
-
-async function saveManualEntry(){
-  const judul = document.getElementById('fJudul').value.trim();
-  if(!judul){ showToast('Judul wajib diisi.'); return; }
-  const record = {
-    judul,
-    kategori: document.getElementById('fKategori').value,
-    tanggalTerbit: document.getElementById('fTanggal').value ? new Date(document.getElementById('fTanggal').value).toISOString() : new Date().toISOString(),
-    sumber: document.getElementById('fSumber').value.trim() || 'Input manual',
-    link: document.getElementById('fLink').value.trim(),
-    tanggalMasuk: new Date().toISOString(),
-    status: 'baru',
-    ditambahkanOleh: 'admin'
-  };
-  const key = 'manual_' + Date.now();
-  const ok = await fbPut(`peraturan/${key}`, record);
-  if(ok){
-    allData[key] = record;
-    closeModal('addModalBg');
-    render(); updateStats();
-    showToast('Peraturan berhasil ditambahkan.');
-  } else {
-    showToast('Gagal menyimpan ke Firebase.');
-  }
-}
-
-/* ---------- Export PDF ---------- */
-function exportPDF(){
+/* ============ PDF EXPORT ============ */
+function generatePDF(){
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  const filtered = getFiltered();
+  const doc = new jsPDF('p','mm','a4');
+  const tahun = getTahun();
+  const list = programsForYear();
+  const akumulasi = list.length ? Math.round(list.reduce((s,p)=>s+(p.persentase||0),0)/list.length) : 0;
+  let y = 15;
 
-  doc.setFontSize(14);
-  doc.text('Daftar Peraturan Perundang-undangan - Industri Semen', 14, 16);
-  doc.setFontSize(9);
-  doc.text(`Dicetak: ${new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'})} | Kategori: ${activeCategory === 'semua' ? 'Semua' : catLabel[activeCategory]}`, 14, 22);
+  if(DB.settings.logo){
+    try{ doc.addImage(DB.settings.logo, 'PNG', 15, y, 20, 20); }catch(e){}
+  }
+  doc.setFontSize(14); doc.setFont(undefined,'bold');
+  doc.text('LAPORAN PROGRAM PENGGERAK PEMBINA GENERUS', 105, y+7, {align:'center'});
+  doc.setFontSize(11);
+  doc.text('DAERAH KOTABARU - TAHUN ' + tahun, 105, y+14, {align:'center'});
+  y += 28;
+  doc.setDrawColor(15,118,110); doc.setLineWidth(0.5); doc.line(15,y,195,y);
+  y += 8;
 
-  const rows = filtered.map(([key, it]) => [
-    catLabel[it.kategori] || 'Lainnya',
-    it.judul || '-',
-    fmtDate(it.tanggalTerbit),
-    it.sumber || '-',
-    it.status === 'baru' ? 'Baru' : 'Dibaca'
-  ]);
+  doc.setFontSize(10); doc.setFont(undefined,'normal');
+  doc.text('Total Program: ' + list.length, 15, y);
+  doc.text('Akumulasi Pencapaian 1 Tahun: ' + akumulasi + '%', 110, y);
+  y += 8;
 
-  doc.autoTable({
-    startY: 28,
-    head: [['Kategori', 'Judul Peraturan', 'Tanggal', 'Sumber', 'Status']],
-    body: rows,
-    styles: { fontSize: 8, cellPadding: 3 },
-    headStyles: { fillColor: [28,43,57] },
-    columnStyles: { 1: { cellWidth: 75 } }
+  const bulanOrder = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  const sorted = [...list].sort((a,b)=>bulanOrder.indexOf(a.bulan)-bulanOrder.indexOf(b.bulan));
+
+  doc.setFont(undefined,'bold'); doc.setFontSize(9);
+  doc.text('Bidang',15,y); doc.text('Program',45,y); doc.text('Bulan',105,y); doc.text('Status',130,y); doc.text('%',160,y); doc.text('Budget',170,y);
+  y += 2; doc.setDrawColor(200); doc.line(15,y,195,y); y += 4;
+  doc.setFont(undefined,'normal');
+
+  sorted.forEach(p=>{
+    if(y > 265){ doc.addPage(); y = 15; }
+    const bidangLines = doc.splitTextToSize(p.bidang, 28);
+    const progLines = doc.splitTextToSize(p.namaProgram, 58);
+    const maxLines = Math.max(bidangLines.length, progLines.length);
+    doc.text(bidangLines, 15, y);
+    doc.text(progLines, 45, y);
+    doc.text(p.bulan, 105, y);
+    doc.text(p.status, 130, y);
+    doc.text(p.persentase+'%', 160, y);
+    doc.text(formatRupiah(p.budgetRealisasi||p.budgetRencana).replace('Rp ',''), 168, y);
+    y += (maxLines*5) + 2;
+
+    if(p.pica && p.pica.problem){
+      doc.setFontSize(8); doc.setTextColor(150,60,0);
+      const picaText = doc.splitTextToSize('PICA: ' + p.pica.problem + ' -> ' + p.pica.action, 175);
+      doc.text(picaText, 17, y);
+      y += (picaText.length*4) + 2;
+      doc.setFontSize(9); doc.setTextColor(0,0,0);
+    }
   });
 
-  doc.save(`peraturan-semen-${new Date().toISOString().slice(0,10)}.pdf`);
-  showToast('PDF berhasil dibuat.');
+  y += 10;
+  if(y > 230){ doc.addPage(); y = 20; }
+  doc.setFont(undefined,'bold'); doc.setFontSize(10);
+  doc.text('LEMBAR PERSETUJUAN', 105, y, {align:'center'});
+  y += 10;
+
+  const colX = [20, 85, 150];
+  const labels = ['Dibuat Oleh,\nSekretaris PPG', 'Dilaporkan Oleh,\nKetua PPG', 'Disetujui Oleh,\nKyai Daerah'];
+  const names = [
+    DB.approvals['sekNama_'+tahun] || '(............................)',
+    DB.approvals['ketuaNama_'+tahun] || '(............................)',
+    DB.approvals['kyaiNama_'+tahun] || '(............................)'
+  ];
+  const sigKeys = ['sig_'+tahun+'_sigSekretaris','sig_'+tahun+'_sigKetua','sig_'+tahun+'_sigKyai'];
+
+  doc.setFont(undefined,'normal'); doc.setFontSize(9);
+  labels.forEach((label,i)=>{
+    const lines = label.split('\n');
+    doc.text(lines, colX[i], y);
+  });
+
+  const sigY = y + 8;
+  sigKeys.forEach((key,i)=>{
+    const data = DB.approvals[key];
+    if(data){
+      try{ doc.addImage(data,'PNG', colX[i]-2, sigY, 35, 18); }catch(e){}
+    }
+  });
+
+  const nameY = sigY + 22;
+  names.forEach((n,i)=>{ doc.text(n, colX[i], nameY); });
+
+  doc.save('Laporan_PPG_Daerah_Kotabaru_'+tahun+'.pdf');
+  showToast('📄 PDF berhasil diunduh');
 }
 
-/* ---------- Init ---------- */
-loadData();
-setInterval(loadData, 5 * 60 * 1000); // refresh otomatis tiap 5 menit
+/* ============ FIREBASE SYNC (REST API) ============ */
+function loadFirebaseUrl(){
+  document.getElementById('fbUrl').value = DB.settings.firebaseUrl || '';
+  updateSyncStatus();
+}
+function updateSyncStatus(){
+  const dot = document.getElementById('syncDot');
+  const status = document.getElementById('syncStatus');
+  if(DB.settings.firebaseUrl){
+    dot.className = 'sync-dot on';
+    status.textContent = 'Terhubung: ' + DB.settings.firebaseUrl;
+  } else {
+    dot.className = 'sync-dot off';
+    status.textContent = 'Belum terhubung';
+  }
+}
+function connectFirebase(){
+  const url = document.getElementById('fbUrl').value.trim().replace(/\/$/, '');
+  DB.settings.firebaseUrl = url;
+  saveData();
+  updateSyncStatus();
+  showToast(url ? '🔗 URL Firebase disimpan' : 'URL dikosongkan');
+}
+async function pushToFirebase(){
+  if(!DB.settings.firebaseUrl){ showToast('Isi URL Firebase dulu'); return; }
+  try{
+    const res = await fetch(DB.settings.firebaseUrl + '/ppgDaerahKotabaru.json', {
+      method: 'PUT',
+      body: JSON.stringify(DB)
+    });
+    if(res.ok) showToast('⬆️ Data berhasil dikirim ke Firebase');
+    else showToast('❌ Gagal mengirim data');
+  }catch(e){ showToast('❌ Koneksi gagal: '+e.message); }
+}
+async function pullFromFirebase(){
+  if(!DB.settings.firebaseUrl){ showToast('Isi URL Firebase dulu'); return; }
+  try{
+    const res = await fetch(DB.settings.firebaseUrl + '/ppgDaerahKotabaru.json');
+    const data = await res.json();
+    if(data){
+      DB = data;
+      saveData();
+      initTahunSelect();
+      loadLogo();
+      renderAll();
+      loadApprovalForYear();
+      showToast('⬇️ Data berhasil ditarik dari Firebase');
+    } else {
+      showToast('Tidak ada data di Firebase');
+    }
+  }catch(e){ showToast('❌ Koneksi gagal: '+e.message); }
+}
+
+/* ============ BACKUP / RESTORE ============ */
+function exportBackup(){
+  const blob = new Blob([JSON.stringify(DB, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'backup_ppg_daerah_kotabaru_'+Date.now()+'.json';
+  a.click();
+  showToast('⬇️ Backup diunduh');
+}
+function restoreBackup(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  requirePin(()=>{
+    const reader = new FileReader();
+    reader.onload = function(ev){
+      try{
+        DB = JSON.parse(ev.target.result);
+        saveData();
+        initTahunSelect();
+        loadLogo();
+        loadFirebaseUrl();
+        renderAll();
+        loadApprovalForYear();
+        showToast('✅ Backup berhasil dipulihkan');
+      }catch(err){ showToast('❌ File backup tidak valid'); }
+    };
+    reader.readAsText(file);
+  });
+}
 </script>
 </body>
 </html>
