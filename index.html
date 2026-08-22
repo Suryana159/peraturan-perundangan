@@ -156,6 +156,18 @@
   .sync-dot.on{background:#4ade80;}
   .sync-dot.off{background:#f87171;}
 
+  /* DETAIL MODAL */
+  .detail-modal-box{
+    background:#fff;border-radius:14px;padding:20px;max-width:520px;width:100%;
+    text-align:left;max-height:85vh;overflow-y:auto;
+  }
+  .detail-modal-box h3{margin:0 0 12px;color:var(--primary-dark);font-size:16px;}
+  .detail-row{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .detail-row .dr-label{color:var(--muted);font-weight:600;min-width:150px;}
+  .detail-row .dr-value{text-align:right;flex:1;}
+  .detail-section-title{font-size:13px;font-weight:700;color:var(--primary-dark);margin:16px 0 6px;}
+  .detail-text-block{background:#f8fafc;border-radius:8px;padding:10px;font-size:13px;white-space:pre-wrap;margin-bottom:6px;}
+
   /* LOGIN OVERLAY */
   #loginOverlay{
     position:fixed;inset:0;z-index:500;
@@ -448,6 +460,18 @@
     <div class="btn-row" style="justify-content:center">
       <button class="btn" onclick="submitPin()">Konfirmasi</button>
       <button class="btn secondary" onclick="closePinModal()">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-bg" id="detailModal">
+  <div class="detail-modal-box">
+    <h3>📄 Detail Program</h3>
+    <div id="detailModalBody"></div>
+    <div class="btn-row" style="justify-content:center;margin-top:10px">
+      <button class="btn secondary" onclick="closeDetailModal()">Tutup</button>
+      <button class="btn" id="detailEditBtn" onclick="">✏️ Edit Program Ini</button>
     </div>
   </div>
 </div>
@@ -746,6 +770,48 @@ function deleteProgram(id){
   });
 }
 
+/* ============ VIEW DETAIL MODAL ============ */
+function viewDetail(id){
+  const p = DB.programs.find(x=>x.id===id);
+  if(!p) return;
+  const statusClass = {'Tercapai':'tercapai','Sebagian':'sebagian','Tidak Tercapai':'tidak'};
+
+  let html = `
+    <div class="detail-row"><span class="dr-label">Tahun</span><span class="dr-value">${p.tahun}</span></div>
+    <div class="detail-row"><span class="dr-label">Nama Bidang</span><span class="dr-value">${escapeHtml(p.bidang)}</span></div>
+    <div class="detail-row"><span class="dr-label">Nama Program</span><span class="dr-value"><b>${escapeHtml(p.namaProgram)}</b></span></div>
+    <div class="detail-row"><span class="dr-label">Bulan Program</span><span class="dr-value">${p.bulan}</span></div>
+    <div class="detail-row"><span class="dr-label">Status</span><span class="dr-value"><span class="badge ${statusClass[p.status]||''}">${p.status}</span></span></div>
+    <div class="detail-row"><span class="dr-label">Persentase Capaian</span><span class="dr-value"><b>${p.persentase}%</b></span></div>
+    <div class="detail-row"><span class="dr-label">Budget Rencana</span><span class="dr-value">${formatRupiah(p.budgetRencana)}</span></div>
+    <div class="detail-row"><span class="dr-label">Budget Realisasi</span><span class="dr-value">${formatRupiah(p.budgetRealisasi)}</span></div>
+
+    <div class="detail-section-title">📝 Realisasi Program</div>
+    <div class="detail-text-block">${escapeHtml(p.realisasi) || '<i style="color:#94a3b8">Tidak ada deskripsi realisasi</i>'}</div>
+  `;
+
+  if(p.pica && (p.pica.problem || p.pica.identifikasi || p.pica.action || p.pica.pic)){
+    html += `<div class="detail-section-title">🔍 PICA (Problem Identification & Corrective Action)</div>`;
+    if(p.pica.problem) html += `<div class="detail-row"><span class="dr-label">Problem</span></div><div class="detail-text-block">${escapeHtml(p.pica.problem)}</div>`;
+    if(p.pica.identifikasi) html += `<div class="detail-row"><span class="dr-label">Identifikasi</span></div><div class="detail-text-block">${escapeHtml(p.pica.identifikasi)}</div>`;
+    if(p.pica.action) html += `<div class="detail-row"><span class="dr-label">Corrective Action</span></div><div class="detail-text-block">${escapeHtml(p.pica.action)}</div>`;
+    if(p.pica.pic) html += `<div class="detail-row"><span class="dr-label">Penanggung Jawab</span><span class="dr-value">${escapeHtml(p.pica.pic)}</span></div>`;
+  } else {
+    html += `<div class="detail-section-title">🔍 PICA</div><div class="detail-text-block"><i style="color:#94a3b8">Tidak ada catatan PICA untuk program ini</i></div>`;
+  }
+
+  if(p.updatedAt){
+    html += `<div class="detail-row" style="border-bottom:none"><span class="dr-label">Terakhir diperbarui</span><span class="dr-value">${new Date(p.updatedAt).toLocaleString('id-ID')}</span></div>`;
+  }
+
+  document.getElementById('detailModalBody').innerHTML = html;
+  document.getElementById('detailEditBtn').onclick = function(){ closeDetailModal(); editProgram(id); };
+  document.getElementById('detailModal').classList.add('show');
+}
+function closeDetailModal(){
+  document.getElementById('detailModal').classList.remove('show');
+}
+
 /* ============ RENDER ============ */
 function renderAll(){
   renderDashboard();
@@ -840,8 +906,9 @@ function renderProgramList(){
       <td>${formatRupiah(p.budgetRealisasi||p.budgetRencana)}</td>
       <td>
         <div class="action-icons">
-          <button onclick="editProgram('${p.id}')">✏️</button>
-          <button onclick="deleteProgram('${p.id}')">🗑️</button>
+          <button onclick="viewDetail('${p.id}')" title="Lihat Detail">👁️</button>
+          <button onclick="editProgram('${p.id}')" title="Edit">✏️</button>
+          <button onclick="deleteProgram('${p.id}')" title="Hapus">🗑️</button>
         </div>
       </td>
     </tr>
